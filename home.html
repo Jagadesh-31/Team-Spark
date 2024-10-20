@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Spark AI Chatbot{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    margin: 0;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Changed font */
+    background-color: #ffffff; /* White background */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px; /* Padding for navbar */
+    background: linear-gradient(135deg, #30343f, #4f4f4f); /* Navbar gradient */
+    color: white; /* Navbar font color */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    transition: background 0.4s, box-shadow 0.4s;
+    z-index: 10;
+  }
+
+  .navbar:hover {
+    background: linear-gradient(135deg, #2a2a2a, #606060);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  .logo {
+    font-size: 2em; /* Slightly smaller */
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    transition: transform 0.3s, color 0.3s;
+  }
+
+  .logo:hover {
+    transform: scale(1.1);
+    color: #f0e68c; /* Highlight color */
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    position: relative;
+  }
+
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-weight: 600;
+    position: relative;
+    transition: color 0.4s;
+  }
+
+  .nav-links a:hover {
+    color: #f0e68c; /* Hover color */
+  }
+
+  h1 {
+    text-align: center;
+    color: #000000; /* Main heading color */
+    font-size: 4em; /* Adjust font size */
+    margin-top: 120px;
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .description {
+    color: #2c2c2c;
+    text-align: center;
+    max-width: 700px;
+    margin: 30px auto;
+    font-size: 1.3em;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: rgba(237, 242, 244, 0.95); /* User message background color */
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+
+  .description:hover {
+    transform: translateY(-5px); /* Subtle lift effect */
+  }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 700px;
+    text-align: center;
+    margin: 20px auto;
+    animation: slideIn 0.5s ease-in-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .btn {
+    padding: 15px 30px;
+    font-size: 1.3em;
+    color: white;
+    background-color: #390099; /* Updated button color */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px;
+    color:hotpink;
+  }
+
+  .btn:hover {
+    background-color: #4b0dc5; /* Lighter button color on hover */
+    box-shadow: 0 6px 20px;
+    color:deepskyblue;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    color: #6b7280;
+    font-size: 0.9em;
+  }
+
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+    }
+    .card {
+      padding: 20px;
+    }
+    .description {
+      font-size: 1.1em;
+    }
+  }
+</style>
+
+
+
+<h1>Welcome to Spark AI</h1>
+
+<div class="card">
+  <div class="description">
+    Engage in an intelligent conversation with our advanced AI DebugBot.
+    DebugBot is an intelligent chatbot tailored for developers seeking real-time assistance with code debugging.
+    Experience the future of AI communication!
+  </div>
+  <div class="form-container">
+    <a href="{{ url_for('auth.chatbot') }}" class="btn">Start Chatting</a>
+  </div>
+</div>
+
+<footer>
+  &copy; {{ current_year }} Spark AI. All rights reserved.
+</footer>
+{% endblock %}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Cywreck{% endblock %}
+
+{% block content %}
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* Dark text color */
+  }
+
+  .header {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    font-size: 3.5em; /* Increased font size */
+    font-weight: bold; /* Bold weight for the header */
+    background: linear-gradient(90deg, #ff006e, #ff4081, #ff80ab, #ff006e); /* More pronounced gradient with #ff006e */
+    -webkit-background-clip: text; /* For gradient text effect */
+    -webkit-text-fill-color: transparent; /* For gradient text effect */
+    text-transform: uppercase; /* Make text all caps */
+  }
+
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 80vh;
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #000000; /* Background color for conversation */
+  }
+
+  /* Custom scrollbar styling */
+  .chat-container::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+  }
+
+  .chat-container::-webkit-scrollbar-thumb {
+    background-color: #7678ed; /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded edges on the scrollbar */
+  }
+
+  .message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .user {
+    background-color: #000000; /* User message background color */
+    color: deepskyblue; /* User font color */
+    align-self: flex-end;
+    text-align: right; /* Align user queries to the right */
+    font-size: 1.42em; /* Slightly larger font size */
+  }
+
+  .ai {
+    background-color: #000000; /* AI message background color */
+    color: #ff006e; /* AI font color */
+    align-self: flex-start;
+    font-size: 1.42em; /* Slightly larger font size */
+  }
+
+  .form-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #user-query {
+    flex-grow: 1;
+    padding: 10px;
+    border: none; /* Remove border */
+    background-color: #ffffff; /* Change background color to white */
+    outline: none; /* Remove outline */
+    color: #000000; /* Dark text color */
+    border-radius: 15px; /* Rounded edges */
+    resize: none; /* Prevent resizing */
+    height: auto; /* Auto height */
+    max-height: 120px; /* Limit height for 5 lines */
+    overflow-y: hidden; /* Hide vertical scrollbar */
+  }
+
+  #send-button {
+    padding: 10px;
+    border: none;
+    border-radius: 15px; /* Rounded edges */
+    background-color: #390099; /* Updated button color */
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  #send-button:hover {
+    background-color: #4b0dc5; /* Lighter button color on hover */
+  }
+
+  /* Loading spinner styles */
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Light grey */
+    border-top: 4px solid #ffffff; /* White */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: none; /* Hidden by default */
+    margin: 10px auto; /* Centered */
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<div class="header" style="background-color: #023047;">Spark AI</div>
+
+<div class="chat-container" id="chat-container">
+    <div id="messages"></div>
+    <div class="spinner" id="loading-spinner"></div> <!-- Loading Spinner -->
+    <div class="form-container">
+        <textarea id="user-query" placeholder="Enter your query" rows="1"></textarea>
+        <button type="button" id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+  const userQuery = document.getElementById('user-query');
+
+  userQuery.addEventListener('input', function() {
+      this.style.height = 'auto'; // Reset height
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px'; // Limit to 120px
+  });
+
+  document.getElementById('send-button').addEventListener('click', sendQuery);
+
+  userQuery.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+          sendQuery();
+          event.preventDefault(); // Prevent default behavior (new line)
+      }
+  });
+
+  function sendQuery() {
+      const query = userQuery.value;
+
+      if (!query.trim()) return; // Don't send empty messages
+
+      appendMessage('user', query); // Display user's message
+      document.getElementById('loading-spinner').style.display = 'block'; // Show spinner
+
+      userQuery.value = ''; // Clear the input field
+      userQuery.style.height = 'auto'; // Reset height for next message
+
+      fetch('/chatbot', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query: query }),  // Send JSON
+      })
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById('loading-spinner').style.display = 'none'; // Hide spinner
+          if (data.response) {
+              appendMessage('ai', data.response);  // Display AI's response
+          } else {
+              console.error('No response from the bot');
+          }
+      })
+      .catch(error => {
+          document.getElementById('loading-spinner').style.display = 'none'; // Hide spinner on error
+          console.error('Error:', error);
+      });
+  }
+
+  function appendMessage(sender, text) {
+      const messagesContainer = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender);
+      messageDiv.innerText = text; // Use innerText to preserve newlines
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight; // Auto-scroll to the bottom
+  }
+
+  document.getElementById('chat-container').addEventListener('wheel', function(event) {
+      const delta = event.deltaY;
+
+      if (this.scrollHeight > this.clientHeight) {
+          this.scrollTop += delta;
+          event.preventDefault(); // Prevent default scroll behavior
+      }
+  });
+</script>
+{% endblock %}
